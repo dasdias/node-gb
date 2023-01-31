@@ -1,1 +1,2 @@
-console.log('Ok');
+let colors = require('colors');
+console.log(colors);
