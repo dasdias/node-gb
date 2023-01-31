@@ -9,7 +9,8 @@
 	"devDependencies": {},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"start": "node index.js"
+		"start": "node index.js",
+		"les1": "node index.js -- 1 20"
 	},
 	"repository": {
 		"type": "git",
