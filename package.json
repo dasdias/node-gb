@@ -10,7 +10,7 @@
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"start": "node index.js",
-		"les1": "node index.js -- 1 20"
+		"les1": "node index.js 2 50"
 	},
 	"repository": {
 		"type": "git",
