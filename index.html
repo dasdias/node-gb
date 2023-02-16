@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Messanger</title>
+	<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+	<style>
+		html,
+		body {
+			height: 100%;
+			padding: 0;
+			margin: 0;
+			background-color: #f5f5f5;
+		}
+
+		.container {
+			max-width: 1024px;
+			margin-left: auto;
+			margin-right: auto;
+			padding-left: 12px;
+			padding-right: 12px;
+		}
+
+		.msg {
+			display: flex;
+			flex-direction: column;
+			height: 100vh;
+			background-color: #f5f5f5;
+		}
+
+		.msg__header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+		}
+
+		.msg__header-wrap {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.msg__users {}
+
+		.msg__users-count {
+			font-weight: 700;
+		}
+
+		.msg__connect {
+			margin-right: 24px;
+			color: tomato;
+			animation: flashing 1.5s linear infinite;
+		}
+
+		@keyframes flashing {
+			0% {
+				color: transparent;
+			}
+
+			50% {
+				color: tomato;
+			}
+
+			100% {
+				color: transparent;
+			}
+		}
+
+		.msg__body {
+			flex-grow: 1;
+			overflow-y: auto;
+		}
+
+		.msg__elem {
+			display: flex;
+			background-color: #516be0;
+			padding: 5px 10px;
+			border-radius: 8px;
+		}
+
+		.msg__elem+.msg__elem {
+			margin-top: 14px;
+		}
+
+		.msg__name {
+			font-weight: 700;
+			margin-right: 24px;
+			font-size: 18px;
+		}
+
+		.msg__form-wrap {
+			display: flex;
+			align-items: center;
+			flex-grow: 1;
+		}
+
+		.msg__input-wrap {
+			padding-right: 10px;
+		}
+
+		.msg__input-wrap:first-child {
+			max-width: 200px;
+			width: 100%;
+		}
+
+		.msg__input-wrap:last-child {
+			width: 100%;
+		}
+
+		.msg__input-name {
+			max-width: 200px;
+			width: 100%;
+		}
+
+		.msg__form {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-bottom: 30px;
+		}
+
+		.msg__input-wrap {
+			position: relative;
+		}
+
+		.msg__form-err {
+			position: absolute;
+			top: -20px;
+			left: 0;
+			color: red;
+		}
+
+		.msg__form-err-name {
+			display: none;
+		}
+
+		.msg__form-err-msg {
+			display: none;
+		}
+
+		.msg__input {
+			width: 100%;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<div class="msg">
+			<div class="msg__header">
+				<h1>Messanger</h1>
+				<div class="msg__header-wrap">
+					<div class="msg__connect"></div>
+					<div class="msg__users">Количество пользователей: <span class="msg__users-count">2</span></div>
+				</div>
+			</div>
+			<div class="msg__body">
+				<!-- <div class="msg__elem">
+					<div class="msg__name">Alex</div>
+					<div class="msg__text">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, quos.</div>
+				</div> -->
+				<!-- <div class="msg__elem">
+					<div class="msg__name">Alex</div>
+					<div class="msg__text">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, quos.</div>
+				</div> -->
+			</div>
+			<form class="msg__form">
+				<div class="msg__form-wrap">
+					<div class="msg__input-wrap">
+						<span class="msg__form-err msg__form-err-name">Укожите имя</span>
+						<input class="msg__input-name" type="text" placeholder="Ваше имя" />
+					</div>
+					<div class="msg__input-wrap">
+						<span class="msg__form-err msg__form-err-msg">Введите сообщение</span>
+						<input class="msg__input" type="text" id="input" autofocus placeholder="Ваше сообщение" />
+					</div>
+				</div>
+				<input type="submit" id="send" value="Send" />
+			</form>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	const msgForm = document.querySelector('.msg__form');
+	const msgBody = document.querySelector(".msg__body");
+	const msgConnect = document.querySelector(".msg__connect");
+	const msgUsersCount = document.querySelector(".msg__users-count");
+	const msgFormErrName = document.querySelector(".msg__form-err-name");
+	const msgFormErrMsg = document.querySelector(".msg__form-err-msg");
+
+	const renderMsg = ({ name, msg }) => {
+		return `
+			<div class="msg__elem">
+				<div class="msg__name">${name}</div>
+				<div class="msg__text">${msg}</div>
+			</div>
+		`
+	}
+	msgForm.addEventListener('submit', function (event) {
+		event.preventDefault();
+		if (document.querySelector('.msg__input-name').value === "") {
+			msgFormErrName.style.display = "inline";
+			setTimeout(() => {
+				msgFormErrName.style.display = "none";
+
+			}, 3000)
+			return
+		}
+		if (document.getElementById('input').value === "") {
+			msgFormErrMsg.style.display = "inline";
+			setTimeout(() => {
+				msgFormErrMsg.style.display = "none";
+
+			}, 3000)
+			return
+		}
+
+		socket.emit('client-msg', {
+			msg: document.getElementById('input').value,
+			name: document.querySelector('.msg__input-name').value
+		})
+		document.getElementById('input').value = ''
+		document.getElementById('input').focus();
+	})
+	const socket = io('localhost:3005')
+	socket.on('connect', (data) => {
+		console.log(data);
+		console.log('Connection with localhost:3005 created')
+	})
+
+	socket.on('new-client', (data) => {
+		console.log(data);
+		msgConnect.innerHTML = "";
+		msgConnect.append(`Подключился новый клиент с id: ${data.newClient}`)
+		setTimeout(() => { msgConnect.innerHTML = ""; }, 10000)
+	})
+	socket.on('count-client', (data) => {
+		console.log(data);
+		msgUsersCount.innerHTML = "";
+		msgUsersCount.append(`${data.count}`)
+	})
+	socket.on('server-msg', (data) => {
+		console.log(data);
+		msgBody.insertAdjacentHTML("afterbegin", renderMsg(data))
+	})
+
+
+
+	// document.getElementById('send')
+	// 	.onclick = function () {
+	// 		socket.emit('client-msg', { msg: document.getElementById('input').value })
+	// 		document.getElementById('input').value = ''
+	// 	}
+</script>
+
+</html>
