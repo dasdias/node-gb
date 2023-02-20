@@ -23,7 +23,7 @@ io.on('connection', (client) => {
 	// console.log(client.clients());
 	client.broadcast.emit('count-client', { count: clientCount })
 	client.emit('count-client', { count: clientCount })
-	client.broadcast.emit('new-client', { newClient: client.id })
+	client.broadcast.emit('client-connect', { msg: "Клиент подключился" })
 	client.on('client-msg', (data) => {
 		// console.log(data);
 		client.broadcast.emit('server-msg', { msg: data.msg, name: data.name }) // отсылаем всем
@@ -34,11 +34,10 @@ io.on('connection', (client) => {
 		console.log(reason);
 		console.log(`Websocket disconnect ${client.id}`)
 		client.broadcast.emit('count-client', { count: clientCount })
+		client.broadcast.emit('client-connect', { msg: `Клиент отключился` })
 	});
 
 })
-
-// console.log(io.sockets.clients());
 
 server.listen(port, host, () =>
 	console.log(`Server running at http://${host}:${port}`)

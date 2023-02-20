@@ -171,7 +171,7 @@
 			<form class="msg__form">
 				<div class="msg__form-wrap">
 					<div class="msg__input-wrap">
-						<span class="msg__form-err msg__form-err-name">Укожите имя</span>
+						<span class="msg__form-err msg__form-err-name">Укажите имя</span>
 						<input class="msg__input-name" type="text" placeholder="Ваше имя" />
 					</div>
 					<div class="msg__input-wrap">
@@ -232,10 +232,10 @@
 		console.log('Connection with localhost:3005 created')
 	})
 
-	socket.on('new-client', (data) => {
+	socket.on('client-connect', (data) => {
 		console.log(data);
 		msgConnect.innerHTML = "";
-		msgConnect.append(`Подключился новый клиент с id: ${data.newClient}`)
+		msgConnect.append(`${data.msg}`)
 		setTimeout(() => { msgConnect.innerHTML = ""; }, 10000)
 	})
 	socket.on('count-client', (data) => {
